@@ -1,7 +1,11 @@
 # 2019-nCoV_graph_model
 
-usage: java -jar 2019-nCoV_v2.jar noaction -ii incubation_infected -t type -p populaiton -icount initilizeInfectedCount -r replicate_time -minI minIncubation -maxI maxIncubation -meanI meanIncubation -os outsign -o outdir
-       java -jar 2019-nCoV_v2.jar action   -ii incubation_infected -t type -p populaiton -icount initilizeInfectedCount -d action_day -r replicate_time -minI minIncubation -maxI maxIncubation -meanI meanIncubation -os outsign -o outdir
+```
+usage: 
+java -jar 2019-nCoV_v2.jar noaction -ii incubation_infected -t type -p populaiton -icount initilizeInfectedCount -r replicate_time -minI minIncubation -maxI maxIncubation -meanI meanIncubation -os outsign -o outdir
+java -jar 2019-nCoV_v2.jar action   -ii incubation_infected -t type -p populaiton -icount initilizeInfectedCount -d action_day -r replicate_time -minI minIncubation -maxI maxIncubation -meanI meanIncubation -os outsign -o outdir
+
+parameters
 -------- subcommand (required, string): noaction or action
 -------- incubation_infected (required, boolean): incubation infected, true or false
 -------- type(required, string): 
@@ -29,3 +33,5 @@ usage: java -jar 2019-nCoV_v2.jar noaction -ii incubation_infected -t type -p po
 -------- meanIncubation (optional, int, default = 7): e.g. 1, 2, 3...
 -------- outsign (optional, string, default = "")
 -------- outdir (optional, string, default = ./)
+
+```
