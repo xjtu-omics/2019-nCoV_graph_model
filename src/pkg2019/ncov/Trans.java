@@ -12,7 +12,7 @@ import java.util.*;
 public class Trans {
     private Region myRegion;
     private int passengerNum;
-    public static float maxRemainSpreadPro=0.1f;
+    public static float maxRemainSpreadPro=0.01f;
     public Trans(){
         myRegion = new Region();
     }
@@ -30,11 +30,20 @@ public class Trans {
         myRegion.setCapacity(AllParameters.cityMaxPeople);
         Vector<People> passengers = new Vector<>();
         Random oneRand = new Random();
+        
+        boolean haveInfectedPerson = false;
+        
         for(int i = 0; i < passengerNum; ++i){
             int index = oneRand.nextInt(oneCity.getPeopleSize());
             People onePerson = oneCity.getPeople().elementAt(index);
             if(!onePerson.getIsolation() && !onePerson.getHomeIsolation()){
                 passengers.add(onePerson);
+//                if((onePerson.isInfection() && onePerson.isInIncubation()) || onePerson.isPhenotype()){
+//                    haveInfectedPerson = true;
+//                }
+                if(onePerson.isInfection()){
+                    haveInfectedPerson = true;
+                }
             }
         }
         //ttbond:set thePeople of region
@@ -45,23 +54,35 @@ public class Trans {
         }else{
             myRegion.spreading();
         }
-        if(!AllParameters.incubationInfection){
-            myRegion.setRemainSpreadPro(0f);
-        }else{
-            if(!myRegion.getDisinfectant()){
-                int haveInfect=0;
-                for(int i=0;i<myRegion.getPeople().size();i++){
-                    if(myRegion.getPeople().elementAt(i).getInfectionTime()>0){
-                        myRegion.setRemainSpreadPro(maxRemainSpreadPro);
-                        haveInfect=1;
-                        break;
-                    }
-                }
-                if(haveInfect==0){
-                    myRegion.setRemainSpreadPro(myRegion.getRemainSpreadPro() * 0.5f);
-                }
+        
+        
+        if(!myRegion.getDisinfectant() && !AllParameters.isCloseTransportation){
+            if(haveInfectedPerson){
+                myRegion.setRemainSpreadPro(maxRemainSpreadPro);
+            }else{
+                myRegion.setRemainSpreadPro(myRegion.getRemainSpreadPro() * 0.5f);
             }
+        }else{
+            myRegion.setRemainSpreadPro(0f);
         }
+        
+//        if(!AllParameters.incubationInfection){
+//            myRegion.setRemainSpreadPro(0f);
+//        }else{
+//            if(!myRegion.getDisinfectant()){
+//                int haveInfect=0;
+//                for(int i=0;i<myRegion.getPeople().size();i++){
+//                    if(myRegion.getPeople().elementAt(i).getInfectionTime()>0){
+//                        myRegion.setRemainSpreadPro(maxRemainSpreadPro);
+//                        haveInfect=1;
+//                        break;
+//                    }
+//                }
+//                if(haveInfect==0){
+//                    myRegion.setRemainSpreadPro(myRegion.getRemainSpreadPro() * 0.5f);
+//                }
+//            }
+//        }
     }
     
     public Region getMyRegion(){

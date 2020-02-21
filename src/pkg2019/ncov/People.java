@@ -5,6 +5,7 @@
  */
 package pkg2019.ncov;
 
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 
@@ -17,13 +18,24 @@ public class People {
     private boolean isIsolation;
     private boolean isHomeIsolation;
     private boolean isGoodHealthHabit;
-    private boolean isAntibody; 
-    private boolean everHospital;
+//    private boolean wasInfected;
+    private boolean isCure; 
+//    private boolean everHospital;
     private boolean isCommunityHospital;
+    private boolean willCure;  // will cure = true, this person will cure. otherwise this person will dead
+    
+    private int infectionType; // 1: infection from fever, 2, infection from non-fever, 3, infection from environment, 0: healthy one
+    
+//    private boolean isIncubationInfection;
+    private boolean isFever;   // patient fever or not
+    private boolean isSevere;  // patient severe or not
+    private boolean isDNADetectable; // patient can be detected by DNA/RNA or not
+    private float maxVirus;  // the maximize virus content
     
     private int incubation; // how many days?
     private int infectionTime; // how many days of infection
     private int lastTime; // how many days from infection to die or cure
+//    private int treatmentTime;
     
     private int familyID;
     private long myR;
@@ -31,7 +43,10 @@ public class People {
     private float spreadPro;
     private float familySpreadPro;
     private float infectionPro;
-    private float deadPro;
+//    private float deadPro;
+    private HashMap<Integer, Float> incubationSpreadPro;
+    
+//    public static boolean isFirst = true;
     
     public People(){
         Random oneRandom = new Random();
@@ -40,8 +55,17 @@ public class People {
         this.isIsolation = false;
         this.isHomeIsolation = false;
         this.isGoodHealthHabit = false;
-        this.isAntibody = false;
+        this.isCure = false;
         this.isCommunityHospital = false;
+        this.willCure = false;
+//        this.wasInfected = false;
+        this.isFever = false;
+        this.isSevere = false;
+        this.isDNADetectable = false;
+        
+        this.maxVirus = 0;
+        
+        this.infectionType = 0;
         
         this.incubation = (int)(AllParameters.meanIncubation + oneRandom.nextGaussian());
         if(this.incubation < AllParameters.minIncubation){
@@ -50,57 +74,107 @@ public class People {
         if(this.incubation > AllParameters.maxIncubation){
             this.incubation = AllParameters.maxIncubation;
         }
+        
         this.infectionTime = 0;
-        this.spreadPro = AllParameters.peopleInitSpreadPro; // may be need to adjust
+        this.incubationSpreadPro = null;
+        this.spreadPro = 0f; // may be need to adjust
         this.lastTime = this.incubation + AllParameters.treatLastTime;  // may be need to adjust
         this.infectionPro = AllParameters.peopleInitInfectionPro; // fix parameter, may be need to change to a random value
-        this.deadPro  = AllParameters.peopleInitDeadPro;  // may be need to adjust
+//        this.deadPro  = AllParameters.peopleInitDeadPro;  // may be need to adjust
         this.familySpreadPro = this.spreadPro;
         
+//        this.treatmentTime = 0;
+        
         this.familyID = -1;
-        this.everHospital=false;
+//        this.everHospital=false;
+    }
+    
+    private HashMap<Integer, Float> incubationSpreadProCalculation(){
+        HashMap<Integer, Float> incubationSpreadPro = new HashMap<>();
+        if(this.incubation == 0){
+            // incubation = 0
+            incubationSpreadPro.put(1, this.maxVirus);
+            return incubationSpreadPro;
+        }
+        float maxSpreadPro = maxVirus;
+        incubationSpreadPro.put(this.incubation + 1, this.maxVirus);
+        float currSpreadPro = maxSpreadPro;
+        for(int i = this.incubation; i > 0; --i){
+            currSpreadPro = currSpreadPro / 2;
+            incubationSpreadPro.put(i, currSpreadPro);
+        }
+        return incubationSpreadPro;
     }
     
     public void setDead(){
         this.isDead = true;
-        this.isAntibody =false;
+        this.isCure =false;
         this.isIsolation = false;
         this.isHomeIsolation = false;
         this.isCommunityHospital = false;
+        this.isFever = false;
+        this.isSevere = false;
+        this.isDNADetectable = false;
+        
+        this.maxVirus = 0f;
         this.spreadPro = 0f;
         this.infectionPro = 0f;
-        this.infectionTime = -1; // was infected
+        this.infectionTime = 0; // was infected
         this.incubation = 0;
-        this.deadPro = 0f;
+//        this.deadPro = 0f;
         this.familySpreadPro = 0f;
+//        this.treatmentTime = 0;
     }
     public boolean getDead(){
         return this.isDead;
     }
     
-    public void setAntibody(){
-        this.isAntibody = true;
+    public void setCure(){
+        this.isCure = true;
         this.isIsolation = false;
         this.isHomeIsolation = false;
         this.isCommunityHospital = false;
+//        this.wasInfected = true;
+        this.willCure    = false;
+        this.isFever = false;
+        this.isSevere = false;
+        this.isDNADetectable = false;
+        this.maxVirus = 0f;
         this.spreadPro = 0f;
-        this.infectionPro = 0f;
-        this.infectionTime = -1; // was infected
-        this.deadPro = 0f;
-        this.incubation = 0;
+        this.infectionPro = AllParameters.peopleInitInfectionPro * AllParameters.cureInfectionProFold;
+        if(AllParameters.cureStillBeInfected){
+            this.infectionTime = 0; // was infected
+        }else{
+            this.infectionTime = -1; // cannot be infected any more
+        }
         this.familySpreadPro = 0;
+//        this.treatmentTime = 0;
     }
-    public boolean getAntibody(){
-        return this.isAntibody;
+    public boolean getCure(){
+        return this.isCure;
+    }
+//    public boolean getWasInfected(){
+//        return this.wasInfected;
+//    }
+    
+    public boolean getFever(){
+        return this.isFever;
     }
     
-    private void setDeadOrAntiBody(){
+    public boolean getSevere(){
+        return this.isSevere;
+    }
+    
+    public boolean getDNADetectable(){
+        return this.isDNADetectable;
+    }
+    
+    private void setDeadOrCure(){
         if(this.infectionTime >= this.lastTime){
-            float deadFloat = new Random().nextFloat();
-            if(deadFloat < this.deadPro){
+            if(!this.willCure){
                 this.setDead();
             }else{
-                this.setAntibody();
+                this.setCure();
             }
         }
     }
@@ -114,7 +188,20 @@ public class People {
         this.spreadPro = 0f;
         this.infectionPro = 0f;
         this.familySpreadPro = 0f;
-        this.deadPro = AllParameters.peopleIsolationDeadPro;
+//        this.deadPro = AllParameters.peopleHospitalDeadPro;
+//        this.treatmentTime = 1;
+        
+        if(!this.willCure){
+            // will dead, need to reset the cure or dead since the dead probability changed
+            float thePro = AllParameters.peopleHospitalDeadPro / AllParameters.peopleInitDeadPro;
+            Random theRand = new Random();
+            float oneRandNumber = theRand.nextFloat();
+            if(oneRandNumber <= thePro){
+                this.willCure = false;
+            }else{
+                this.willCure = true;
+            }
+        }
     }
     
     public void setHomeIsolation(){
@@ -124,10 +211,9 @@ public class People {
     
     public void setCommunityHospital(){
 //        this.setHomeIsolation();
-        if(this.isPhenotype()){
-            this.setIsolation();
+        if(this.getFever()){
             this.isCommunityHospital = true;
-            this.deadPro = AllParameters.peopleIsolationDeadPro;
+            this.setIsolation();
         }
     }
     
@@ -148,13 +234,13 @@ public class People {
     }
     
     public float getFamilySpreadPro(){
-        float fsp = this.familySpreadPro;
-        if(!AllParameters.incubationInfection){
-            if(this.infectionTime<=this.incubation){
-                fsp=0;
-            }
-        }
-        return fsp;
+//        float fsp = this.familySpreadPro;
+//        if(!this.isIncubationInfection){
+//            if(this.infectionTime<=this.incubation){
+//                fsp=0;
+//            }
+//        }
+        return this.familySpreadPro;
     }
     
     public void setFamilyID(int id){
@@ -175,11 +261,11 @@ public class People {
         if(this.spreadPro <= 0.0f){
             this.spreadPro = 0.01f;
         }
-        if(!AllParameters.incubationInfection){
-            if(this.infectionTime<=this.incubation){
-                this.spreadPro=0;
-            }
-        }
+//        if(!this.isIncubationInfection){
+//            if(this.infectionTime<=this.incubation){
+//                this.spreadPro=0;
+//            }
+//        }
         this.familySpreadPro = this.spreadPro;
         this.infectionPro = this.infectionPro * AllParameters.goodHealthReduceSpreProFold;
         if(this.infectionPro <= 0.0f){
@@ -197,43 +283,83 @@ public class People {
         return this.incubation;
     }
     
+//    public boolean getIncubationInfected(){
+//        return this.isIncubationInfection;
+//    }
+    
+    private float getSpreadDecreasePerDay(){
+        return this.maxVirus / AllParameters.treatLastTime;
+    }
+    
     public void updateInfectionTime(){
         if(this.infectionTime == 0 || this.infectionTime == -1){ // health people or was infected but cure people
             return;
         }
         this.infectionTime++;
-        if(this.spreadPro == 1){
-            this.spreadPro -= AllParameters.peopleSpreadProChangePerDay;
-            if(this.spreadPro < 0f){
-                this.spreadPro = 0f;
-            }
-        }else{
-            this.spreadPro += AllParameters.peopleSpreadProChangePerDay;
-            if(this.spreadPro > 1f){
-                this.spreadPro = 1f;
+//        if(this.isIsolation){
+//            this.treatmentTime++;
+//        }
+        
+         // spredPro has been calculated in the hashmap
+        if(!this.isIsolation){
+            if(this.infectionTime <= this.incubation + 1){
+                this.spreadPro = this.incubationSpreadPro.get(this.infectionTime);
+            }else{
+                if(this.willCure){ 
+                    // if patient will cure, the spread probability will decrease
+                    this.spreadPro -= this.getSpreadDecreasePerDay();
+                }
+                if(this.spreadPro < 0){
+                    this.spreadPro = 0;
+                }
             }
         }
-//        if(!AllParameters.incubationInfection){
-//            if(this.infectionTime<=this.incubation){
-//                this.spreadPro=0;
-//            }
-//        }
-        this.familySpreadPro = this.spreadPro;
-        setDeadOrAntiBody();
+
+        if(this.spreadPro > 1){
+            System.err.println("there are some erros");
+        }
+        if(this.spreadPro < 0){
+            System.err.println("there are some erros");
+        }
+        if(!this.isHomeIsolation){
+            this.familySpreadPro = this.spreadPro;
+        }
+        this.setDeadOrCure();
+        
+        // once over incubation, should set fever and severe
+//        this.setFeverAndSevere();
     }
+    
+    public int getInfectionType(){
+        return this.infectionType;
+    }
+    
     public void infection(People sourcePeople){
         if(this.infectionTime == 0){
             this.infectionTime = 1;
-            this.spreadPro = AllParameters.peopleSpreadProChangePerDay;
-            if(!AllParameters.incubationInfection){
-                if(this.infectionTime<=this.incubation){
-                    this.spreadPro=0;
-                }
-            }
+            
+            this.setPatientType();
+            this.incubationSpreadPro = this.incubationSpreadProCalculation();
+            
+            this.spreadPro = this.incubationSpreadPro.get(this.infectionTime);
             this.familySpreadPro = this.spreadPro;
+//            this.setWillCure();
+            this.isCure = false; // reset the cure state
             if(sourcePeople!=null){
                 sourcePeople.addMyR();
             }
+            
+            if(sourcePeople == null){
+                this.infectionType = 3;
+            }else{
+                if(sourcePeople.getFever()){
+                    this.infectionType = 1;
+                }else{
+                    this.infectionType = 2;
+                }
+            }
+            // for person with 0 incubation
+//            this.setFeverAndSevere();
         }
     }
     public int getInfectionTime(){
@@ -248,11 +374,11 @@ public class People {
     }
     public float getSpreadPro(){
         float sp = this.spreadPro;
-        if(!AllParameters.incubationInfection){
-            if(this.infectionTime<=this.incubation){
-                sp=0;
-            }
-        }
+//        if(!this.isIncubationInfection){
+//            if(this.infectionTime<=this.incubation){
+//                sp=0;
+//            }
+//        }
         return sp;
     }
     
@@ -260,44 +386,70 @@ public class People {
         this.infectionPro = iPro;
     }
     public float getInfectionPro(){
-        return this.infectionPro;
+//        return this.infectionPro;
+        
+        float ip = this.infectionPro;
+//        if(!AllParameters.cureStillBeInfected){
+//            if(this.wasInfected){
+//                ip = 0;
+//            }
+//        }
+        return ip;
     }
     
     public boolean isInIncubation(){
         return (this.infectionTime > 0 && this.infectionTime <= this.incubation);
     }
     
-    public boolean isPhenotype(){
-        return (this.infectionTime > this.incubation);
+    private void setPatientType(){
+        Random virusRandom = new Random();
+        float oneMaxVirus = virusRandom.nextFloat();
+        this.maxVirus = oneMaxVirus;
+
+        // patient type grouped into: server, fever, dna/rna detectable, others
+        if(this.maxVirus >= (1 - AllParameters.severePropation)){
+            this.isSevere = true;
+            this.isFever = true;
+            this.isDNADetectable = true;
+            // if one patient is server, he/she will have probability to dead
+            float severDeadPro = AllParameters.peopleInitDeadPro / AllParameters.severePropation;
+            Random cureRandom = new Random();
+            float oneCure = cureRandom.nextFloat();
+            if(oneCure >= severDeadPro){ // will cure
+                this.willCure = true;
+            }
+        }else if(this.maxVirus >= (1 - AllParameters.feverPropation)){
+            this.isFever = true;
+            this.isDNADetectable = true;
+            this.willCure = true;
+        }else if(this.maxVirus >= (1 - AllParameters.rnaDetectionPropation)){
+            this.isDNADetectable = true;
+            this.willCure = true;
+        }else{
+            this.willCure = true;
+        }
     }
     
     public boolean isNeedHospital(){
         if(this.isIsolation){
             return false;
-        }else if(this.infectionTime > this.incubation){
-            if(this.everHospital){
-                return true;
-            }else{
-                Random infectRandom = new Random(); // 0-1 random float
-                if(infectRandom.nextFloat() > 0.5){
-                    this.everHospital=true;
+        }else{
+            if(this.infectionTime > this.incubation && this.getFever()){
+                if(Functions.hosiptal.getAviliableSizeOfHospital() > 0){
                     return true;
-                }
-                else{
+                }else{
+                    this.setHomeIsolation();
                     return false;
                 }
+            }else{
+                return false;
             }
-        }else{
-            return false;
         }
     }
     
     public void touch(People sourcePeople){
-        if(this.getAntibody()){
-            return;
-        }
         Random infectRandom = new Random(); // 0-1 random float
-        if(infectRandom.nextFloat() < infectionPro){
+        if(infectRandom.nextFloat() < this.getInfectionPro()){
             this.infection(sourcePeople);
         }
     }

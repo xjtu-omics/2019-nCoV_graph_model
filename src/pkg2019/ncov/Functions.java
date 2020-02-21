@@ -170,6 +170,12 @@ public class Functions {
     
     public static void personalSpread(Region oneCity, int interactionNum){
         Random oneRand = new Random();
+        
+        ////for percentage of close transportation
+        if(AllParameters.isCloseTransportation){
+            interactionNum = (int)(interactionNum * (1.0f - AllParameters.percentageCloseTransportation));
+        }
+        
         for(int i = 0; i < interactionNum; ++i){
             int index1 = oneRand.nextInt(oneCity.getPeopleSize());
             int index2 = oneRand.nextInt(oneCity.getPeopleSize());
@@ -215,14 +221,29 @@ public class Functions {
         transPassengerNumber.replace("bus",    parameters.busPassangerNum);
 //        transPassengerNumber.replace("boat",   parameters.boatPassangerNum);
         transPassengerNumber.replace("subway", parameters.subwayPassangerNum);
-        transPassengerNumber.replace("public", parameters.publicPassangerNum);
-        transPassengerNumber.replace("other",  parameters.otherPassangerNum);
         
-        transWorkNumPerDay.replace("taxi", parameters.taxiWorkNumPerDay);
-        transWorkNumPerDay.replace("bus", parameters.busWorkNumPerDay);
-        transWorkNumPerDay.replace("subway", parameters.subwayWorkNumPerDay);
+        int publicPass = parameters.publicPassangerNum;
+        int otherPass  = parameters.otherPassangerNum;
+        int taxiWorkNumPerDay = parameters.taxiWorkNumPerDay;
+        int busWorkNumPerDay  = parameters.busWorkNumPerDay;
+        int subwayWorkNumPerDay = parameters.subwayWorkNumPerDay;
         
+        //// for percentage close public transportation
+        if(AllParameters.isCloseTransportation){
+            publicPass = (int)(publicPass * (1.0f - AllParameters.percentageCloseTransportation));
+            otherPass = (int)(otherPass * (1.0f - AllParameters.percentageCloseTransportation));
+            taxiWorkNumPerDay = (int)(taxiWorkNumPerDay * (1.0f - AllParameters.percentageCloseTransportation));
+            busWorkNumPerDay = (int)(busWorkNumPerDay * (1.0f - AllParameters.percentageCloseTransportation));
+            subwayWorkNumPerDay = (int)(subwayWorkNumPerDay * (1.0f - AllParameters.percentageCloseTransportation));
+        }
         
+        transPassengerNumber.replace("public", publicPass);
+        transPassengerNumber.replace("other",  otherPass);
+        transWorkNumPerDay.replace("taxi", taxiWorkNumPerDay);
+        transWorkNumPerDay.replace("bus", busWorkNumPerDay);
+        transWorkNumPerDay.replace("subway", subwayWorkNumPerDay);
+        
+//        Random oneRandm = new Random();
         for(int i = 0; i < totalTransNum; i++){
             String name=transVec.elementAt(i).getMyRegion().getRegionName();
             for(int j = 0; j < transWorkNumPerDay.get(name); j++){
@@ -239,6 +260,11 @@ public class Functions {
     public static int goToHospital(Region oneCity, Region hospital){
         int numGoToHospital = 0;
         hospital.removeBedPeople(); // remove the dead or antibody person
+        
+        if(hospital.getAviliableSizeOfHospital() == 0){
+            return 0;
+        }
+        
         for(int i = 0; i < oneCity.getPeopleSize(); ++i){
             // if one person infection_time > Incubation_time
             People onePerson = oneCity.getPeople().elementAt(i);
@@ -270,11 +296,13 @@ public class Functions {
                 int id = transIdSt.get(transName) + offSetId;
                 transVec.elementAt(id).oneTrans(oneCity, onePerson);
                 hospital.spreading(onePerson);
-                if(hospital.getAviliableSizeOfHospital() > 1){
+//                System.out.println("hospital size:" + hospital.getAviliableSizeOfHospital());
+                if(hospital.getAviliableSizeOfHospital() > 0){
                     hospital.addBedPeople(onePerson);
                     onePerson.setIsolation();
 //                    hospital.clearMemory();
                 }else{
+//                    System.out.println("Hospital full");
                     onePerson.setHomeIsolation();
                 }
             }
@@ -320,6 +348,11 @@ public class Functions {
         parameters.personalInteractionNum = 0;
     }
     
+    public static void closePublicTransportation(Region city){
+        AllParameters.isCloseTransportation = true;
+        city.homeIsolation();
+    }
+    
     public static void goodHealth(Region city){
         city.setGoodHealthHabit();
     }
@@ -347,59 +380,27 @@ public class Functions {
     
     public static void springFestival(){
         isSpringFestival=true;
-//        parameters.personalInteractionNum = parameters.personalInteractionNum * 5;
-//        parameters.boatPassangerNum   = (int)(parameters.boatPassangerNum * 1.5);
-//        parameters.busPassangerNum    = (int)(parameters.busPassangerNum * 1.5);
-//        parameters.taxiPassangerNum   = (int)(parameters.taxiPassangerNum * 1.5);
-//        parameters.subwayPassangerNum = (int)(parameters.subwayPassangerNum * 1.5);
-//        parameters.publicPassangerNum = (int)(parameters.publicPassangerNum * 1.5);
-//        parameters.otherPassangerNum  = (int)(parameters.otherPassangerNum * 1.5);
     }
+    
     public static void endSpringFestival(){
         if(isSpringFestival)
             isSpringFestival = false;
     }
     
-    public static void AmericaLikeRegion(){
-//        parameters.personalInteractionNum = parameters.personalInteractionNum / 2;
-//        
-//        parameters.busNumber = parameters.busNumber / 3;
-//        parameters.busPassangerNum = parameters.busPassangerNum / 3;
-//        parameters.busWorkNumPerDay = parameters.busWorkNumPerDay / 3;
-//        
-//        parameters.taxiNumber = parameters.taxiNumber / 3;
-//        parameters.taxiWorkNumPerDay = parameters.taxiWorkNumPerDay / 3;
-//        
-//        parameters.subwayNumber = parameters.subwayNumber / 3;
-//        parameters.subwayPassangerNum = parameters.subwayPassangerNum / 3;
-//        parameters.subwayWorkNumPerDay = parameters.subwayWorkNumPerDay / 3;
-//        
-//        parameters.publicPassangerNum  = parameters.publicPassangerNum / 3;
-        closeBus();
-        closeTaxi();
-        closeSubWay();
-    }
+//    public static void AmericaLikeRegion(){
+//        closeBus();
+//        closeTaxi();
+//        closeSubWay();
+//    }
     
-    public static void PoorLikeRegion(){        
-//        parameters.busNumber = parameters.busNumber / 5;
-//        parameters.busPassangerNum = parameters.busPassangerNum / 5;
-//        parameters.busWorkNumPerDay = parameters.busWorkNumPerDay / 5;
+//    public static void AfricaLikeRegion(){        
+//        closeBus();
+//        closeTaxi();
+//        closeSubWay();
+//        closePublic();
 //        
-//        parameters.taxiNumber = parameters.taxiNumber / 5;
-//        parameters.taxiWorkNumPerDay = parameters.taxiWorkNumPerDay / 5;
-//        
-//        parameters.subwayNumber = 0;
-//        parameters.subwayPassangerNum = 0;
-//        parameters.subwayWorkNumPerDay = 0;
-//        
-//        parameters.publicPassangerNum  = parameters.publicPassangerNum / 5;
-        closeBus();
-        closeTaxi();
-        closeSubWay();
-        closePublic();
-        
-        parameters.hospitalCapacityForVirus /= 2;
-    }
+//        parameters.hospitalCapacityForVirus /= 2;
+//    }
     
     public static int getTotalInfectionNumber(Region oneCity){
         return oneCity.getInfectionPeopleNumber();
@@ -410,7 +411,7 @@ public class Functions {
     }
     
     public static int getTotalAntibodyNumber(Region oneCity){
-        return oneCity.getAntibodyPeopleNumber();
+        return oneCity.getCuredPeopleNumber();
     }
    
     public static void specialAction(Region oneCity){

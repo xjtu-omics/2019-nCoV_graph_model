@@ -91,20 +91,75 @@ public class Region {
         return num;
     }
     
-    public int getPhenotypePeopleNumber(){ // specific to city
+    public int getFeverPeopleNumber(){ // specific to city
         int num = 0;
         for(People onePerson : this.thePeople){
-            if(onePerson.isPhenotype()){
+            if(onePerson.getFever()){
                 num++;
             }
         }
         return num;
     }
     
-    public int getAntibodyPeopleNumber(){ // specific to City
+    public int getInfectionFromFeverPeopleNumber(){ // specific to city
         int num = 0;
         for(People onePerson : this.thePeople){
-            if(onePerson.getAntibody()){
+            if(onePerson.getInfectionType() == 1){
+                num++;
+            }
+        }
+        for(People oneDeadPerson : this.deadPeople){
+            if(oneDeadPerson.getInfectionType() == 1){
+                num++;
+            }
+        }
+        return num;
+    }
+    
+    public int getInfectionFromNonFeverPeopleNumber(){ // specific to city
+        int num = 0;
+        for(People onePerson : this.thePeople){
+            if(onePerson.getInfectionType() == 2){
+                num++;
+            }
+        }
+        for(People oneDeadPerson : this.deadPeople){
+            if(oneDeadPerson.getInfectionType() == 2){
+                num++;
+            }
+        }
+        return num;
+    }
+    
+    public int getInfectionFromAnimalPeopleNumber(){ // specific to city
+        int num = 0;
+        for(People onePerson : this.thePeople){
+            if(onePerson.getInfectionType() == 3){
+                num++;
+            }
+        }
+        for(People oneDeadPerson : this.deadPeople){
+            if(oneDeadPerson.getInfectionType() == 3){
+                num++;
+            }
+        }
+        return num;
+    }
+    
+    public int getSeverePeopleNumber(){ // specific to city
+        int num = 0;
+        for(People onePerson : this.thePeople){
+            if(onePerson.getSevere()){
+                num++;
+            }
+        }
+        return num;
+    }
+    
+    public int getCuredPeopleNumber(){ // specific to City
+        int num = 0;
+        for(People onePerson : this.thePeople){
+            if(onePerson.getCure()){
                 num++;
             }
         }
@@ -118,7 +173,7 @@ public class Region {
     public int getAccumulateInfectedPeopleNumber(){
         int num = 0;
         for(People onePerson : this.thePeople){
-            if(onePerson.getInfectionTime() != 0){
+            if(onePerson.getInfectionTime() > 0 || onePerson.getCure()){
                 num++;
             }
         }
@@ -139,8 +194,21 @@ public class Region {
     }
     
     public void homeIsolation(){ // specific to city
+        
+        /// for percentage close public transportation
+        int totalCount = this.thePeople.size();
+        if(AllParameters.isCloseTransportation){
+            if(AllParameters.percentageCloseTransportation > 0f){
+                totalCount = (int)(totalCount * AllParameters.percentageCloseTransportation);
+            }
+        }
+        int count = 0;
         for(People onePerson : this.thePeople){
             onePerson.setHomeIsolation();
+            count++;
+            if(count == totalCount){
+                break;
+            }
         }
     }
     
@@ -187,7 +255,7 @@ public class Region {
     public void removeBedPeople(){   // specific to hospital     
         for (Iterator<People> iterator = this.bedPeople.iterator(); iterator.hasNext();) {
             People oneBedPerson = iterator.next();
-            if(oneBedPerson.getDead() || oneBedPerson.getAntibody()){
+            if(oneBedPerson.getDead() || oneBedPerson.getCure()){
                 iterator.remove();
             }
         }
@@ -220,11 +288,20 @@ public class Region {
         int maxTouchNumber = Functions.regionMaxTouchNumber.get(this.regionName);
         int touchNumber = (peopleNumber < maxTouchNumber ? peopleNumber : maxTouchNumber);
         float rsp = this.remainSpreadPro;
-        if(!AllParameters.incubationInfection){
+        
+        boolean isRemain = false;
+        for(People oneperson : infectedPeople){
+            if(oneperson.isInfection()){
+               isRemain = true;
+               break;
+            }
+        }
+        if(!isRemain){
             rsp = 0f;
         }
+        
         if(infectedPeople.size() == 0){
-            peopleSpread(this.remainSpreadPro, touchNumber, peopleNumber,null);
+            peopleSpread(this.remainSpreadPro, touchNumber, peopleNumber, null);
             return;
         }
         for(People onePerson : infectedPeople){
@@ -251,10 +328,14 @@ public class Region {
         int touchNumber = (peopleNumber < maxTouchNumber ? peopleNumber : maxTouchNumber);
         for(People onePerson : infectedPeople){
             // the i-th infected people
+//            if(onePerson.getIsolation()){
+//                continue;
+//            }
             float spredPro = onePerson.getFamilySpreadPro(); // spread probability
             peopleSpread(spredPro, touchNumber, peopleNumber,onePerson);
         }
     }
+    
     public void springSpreading(){
         Vector<People> infectedPeople = this.getInfectPeople();
         boolean toInfect=false;
@@ -266,12 +347,13 @@ public class Region {
         }
         if(toInfect){
             for(People onePerson:this.thePeople){
-                if(!onePerson.getAntibody()){
+                if(!onePerson.getCure()){
                     onePerson.infection(null);
                 }
             }
         }
     }
+    
     public void clearMemory(){
         this.thePeople.clear();
     }
@@ -281,7 +363,7 @@ public class Region {
         double totalInfectNum=0;
         for (Iterator<People> iterator = this.thePeople.iterator(); iterator.hasNext();) {
             People onePerson = iterator.next();
-            if(onePerson.getAntibody()){
+            if(onePerson.getCure()){
                 infectPeopleNum++;
                 totalInfectNum+=onePerson.getMyR();
             }
