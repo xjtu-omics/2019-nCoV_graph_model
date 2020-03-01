@@ -32,6 +32,7 @@ usage: java -jar 2019-nCoV_v4.jar subcommand -t type -r replicate_time -os outsi
 # the default config file
 
 ```
+default config file is : dg_config
 ##########################################################################
 ##theconfigfileofdynamicgraphmodelof2019-nCoVsimulation
 ##########################################################################
