@@ -234,7 +234,7 @@ public class AllParameters {
         }
         
         if(this.hospitalCapacityForVirus == -1){
-            this.hospitalCapacityForVirus = oneInitCiyt.hospitalBedNum;
+            this.hospitalCapacityForVirus = oneInitCiyt.hospitalICUNum;
         }
         this.hospitalPeopleNumPerDay  = oneInitCiyt.oneDayPatients;
         this.familyNumber             = (int)(AllParameters.populationSize * AllParameters.populationProporationForFamily / AllParameters.familyMemberNumber);

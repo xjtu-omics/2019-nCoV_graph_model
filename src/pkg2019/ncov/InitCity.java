@@ -13,7 +13,7 @@ public class InitCity {
 
     protected int population; // 城市的人口 wuhan 11,000,000
     protected int hospitalNum; // 城市医院数量wuhan 2018 398
-    protected int hospitalBedNum;  // 城市病床数量wuhan 2018 398*1200
+    protected int hospitalICUNum;  // 城市病床数量wuhan 2018 398*1200
     protected int oneDayPatients; // 每天接诊的病人数
     protected int oneDayPatientsFever; //城市发热门诊接诊人数
 
@@ -48,7 +48,7 @@ public class InitCity {
     public InitCity(int population) {
         this.population = population;
         this.hospitalNum = population / (11000000 / 398);
-        this.hospitalBedNum = (int) (population / (float) (11000000 / (20 * 500)));
+        this.hospitalICUNum = (int) (population / (float) (11000000 / (20 * 500)));
         this.oneDayPatients = this.hospitalNum * 400;
         this.oneDayPatientsFever = (int) (this.oneDayPatients * 0.1);  // 十分之一的发热门诊病人
 
@@ -74,7 +74,7 @@ public class InitCity {
         this.population = population;
 
         this.hospitalNum = population / (11000000 / 600);
-        this.hospitalBedNum = (int) (population / (float) (11000000 / (20 * 500)));
+        this.hospitalICUNum = (int) (population / (float) (11000000 / (20 * 500)));
 
         this.oneDayPatients = this.hospitalNum * 400;
         this.oneDayPatientsFever = (int) (this.oneDayPatients * 0.1);  // 十分之一的发热门诊病人
@@ -96,7 +96,7 @@ public class InitCity {
     public void setStLouis(int population) {
         this.population = population;
         this.hospitalNum = population / (11000000 / 600);
-        this.hospitalBedNum = (int) (population / (float) (11000000 / (20 * 500)));
+        this.hospitalICUNum = (int) (population / (float) (11000000 / (20 * 500)));
         this.oneDayPatients = this.hospitalNum * 400;
         this.oneDayPatientsFever = (int) (this.oneDayPatients * 0.1);  // 十分之一的发热门诊病人
 
@@ -117,7 +117,7 @@ public class InitCity {
     public void setYinChuan(int population) {
         this.population = population;
         this.hospitalNum = population / (11000000 / 400);
-        this.hospitalBedNum = (int) (population / (float) (11000000 / (20 * 500)));
+        this.hospitalICUNum = (int) (population / (float) (11000000 / (20 * 500)));
         this.oneDayPatients = this.hospitalNum * 400;
         this.oneDayPatientsFever = (int) (this.oneDayPatients * 0.1);  // 十分之一的发热门诊病人
 
@@ -139,7 +139,7 @@ public class InitCity {
         this.population = population;
         //population=12790000
         this.hospitalNum = population / (11000000 / 600);
-        this.hospitalBedNum = (int) (population / (float) (11000000 / (20 * 500)));
+        this.hospitalICUNum = (int) (population / (float) (11000000 / (20 * 500)));
 
         this.oneDayPatients = this.hospitalNum * 400;
         this.oneDayPatientsFever = (int) (this.oneDayPatients * 0.1);  // 十分之一的发热门诊病人
@@ -162,7 +162,7 @@ public class InitCity {
         this.population = population;
         //population=12150996  4000000
         this.hospitalNum = population / (11000000 / 600);
-        this.hospitalBedNum = (int) (population / (float) (11000000 / (20 * 500)));
+        this.hospitalICUNum = (int) (population / (float) (11000000 / (20 * 500)));
 
         this.oneDayPatients = this.hospitalNum * 400;
         this.oneDayPatientsFever = (int) (this.oneDayPatients * 0.1);  // 十分之一的发热门诊病人
@@ -184,7 +184,7 @@ public class InitCity {
         this.population = population;
         //population=12150996
         this.hospitalNum = population / (11000000 / 600);
-        this.hospitalBedNum = (int) (population / (float) (11000000 / (20 * 500)));
+        this.hospitalICUNum = (int) (population / (float) (11000000 / (20 * 500)));
 
         this.oneDayPatients = this.hospitalNum * 400;
         this.oneDayPatientsFever = (int) (this.oneDayPatients * 0.1);  // 十分之一的发热门诊病人
@@ -207,7 +207,7 @@ public class InitCity {
         this.population = population;
         //population=12150996  4000000
         this.hospitalNum = population / (11000000 / 600);
-        this.hospitalBedNum = (int) (population / (float) (11000000 / (20 * 500)));
+        this.hospitalICUNum = (int) (population / (float) (11000000 / (20 * 500)));
 
         this.oneDayPatients = this.hospitalNum * 400;
         this.oneDayPatientsFever = (int) (this.oneDayPatients * 0.1);  // 十分之一的发热门诊病人
