@@ -69,6 +69,6 @@ closeTransportationPerscent=0.0                 ## the percentage of public tran
 patientWithFeverProbability=0.438				## the proporation of patients with fever
 patientSevereProbability=0.15					## the proporation of patients is severe
 patientRNADetectionProbability=0.9				## the proporation of patients can be detected by RNA/DNA
-increaseHospitalResource=100					## increase the hospital resource, if the action is decrease death rate
+increaseHospitalResource=100					## increase the hospital resource, to test whether the action is decrease death rate
 decreaseDeathRateInfectionNum=100				## the infection number threshold for begining decrease death rate, if the action is decrease death rate
 ```
